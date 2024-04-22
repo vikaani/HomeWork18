@@ -48,10 +48,14 @@ extension MainModel: MainModelInput {
         
         guard let url = URL(string: urlString) else { return }
         
-        if let data = try? Data(contentsOf: url) {
+        DispatchQueue.global(qos: .userInitiated).async {
+            if let data = try? Data(contentsOf: url) {
+                self.dataService.write(image: data, for: urlString)
+            }
             
-            dataService.write(image: data, for: urlString)
-            output.imageDataDidLoad(for: indexPath)
+            DispatchQueue.main.async {
+                self.output.imageDataDidLoad(for: indexPath)
+            }
         }
     }
 }
